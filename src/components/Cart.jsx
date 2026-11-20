@@ -44,13 +44,17 @@ function Cart() {
             <button onClick={() => setIsOpen(false)}>×</button>
           </div>
 
-          <div className="cart-items">
-            {items.length === 0 ? (
-              <p>Корзина пуста</p>
-            ) : (
-              items.map((item) => <CartItem key={item.id} item={item} />)
-            )}
-          </div>
+          {items.length === 0 ? (
+            <p>Корзина пуста</p>
+          ) : (
+            <ul className="cart-items">
+              {items.map((item) => (
+                <li key={item.id}>
+                  <CartItem item={item} />
+                </li>
+              ))}
+            </ul>
+          )}
 
           <div className="cart-footer">
             <div className="total">Итого: ${totalPrice}</div>

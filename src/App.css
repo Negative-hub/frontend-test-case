@@ -222,7 +222,7 @@ body {
   border-bottom: 1px solid #f0f0f0;
 }
 
-.cart-item:last-child {
+.cart-items li:last-child .cart-item {
   border-bottom: none;
 }
 
@@ -365,4 +365,13 @@ body {
   .cart-item img {
     align-self: center;
   }
+}
+
+.products,
+.cart-items {
+  list-style: none;
+}
+
+.products .product-card {
+  height: 100%;
 }

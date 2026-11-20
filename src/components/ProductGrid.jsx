@@ -14,11 +14,13 @@ function ProductGrid({ products, status, error }) {
   }
 
   return (
-    <div className="products">
+    <ul className="products">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <li key={product.id}>
+          <ProductCard product={product} />
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
 

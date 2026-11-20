@@ -8,10 +8,10 @@ function App() {
   return (
     <div className="app">
       <Header />
-      <div className="main-content">
+      <main className="main-content">
         <ProductList />
         <Cart />
-      </div>
+      </main>
     </div>
   )
 }
