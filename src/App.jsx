@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 import {
   store,
-  setProducts,
-  setLoading,
+  fetchProducts,
   selectProducts,
-  selectProductsLoading,
+  selectProductsStatus,
+  selectProductsError,
   addToCart,
   removeFromCart,
   updateQuantity,
-  clearCart,
+  checkout,
+  selectIsCheckingOut,
   selectCartItems,
   selectCartCount,
   selectCartTotal,
-  setUser,
+  fetchUser,
   selectUser,
 } from './store'
 
@@ -36,7 +37,8 @@ function App() {
 function ProductList() {
   const dispatch = useDispatch()
   const products = useSelector(selectProducts)
-  const loading = useSelector(selectProductsLoading)
+  const status = useSelector(selectProductsStatus)
+  const error = useSelector(selectProductsError)
   
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -44,20 +46,7 @@ function ProductList() {
   const [showFilters, setShowFilters] = useState(false)
 
   useEffect(() => {
-    dispatch(setLoading(true))
-    
-    setTimeout(() => {
-      const mockProducts = [
-        { id: 1, name: 'iPhone 14', price: 799, category: 'phones', image: 'https://via.placeholder.com/200', description: 'Новейший iPhone' },
-        { id: 2, name: 'Samsung Galaxy S23', price: 699, category: 'phones', image: 'https://via.placeholder.com/200', description: 'Флагман Samsung' },
-        { id: 3, name: 'MacBook Pro', price: 1999, category: 'laptops', image: 'https://via.placeholder.com/200', description: 'Мощный ноутбук Apple' },
-        { id: 4, name: 'Dell XPS 13', price: 1299, category: 'laptops', image: 'https://via.placeholder.com/200', description: 'Премиум ноутбук Dell' },
-        { id: 5, name: 'iPad Air', price: 599, category: 'tablets', image: 'https://via.placeholder.com/200', description: 'Планшет Apple' },
-        { id: 6, name: 'Samsung Galaxy Tab', price: 399, category: 'tablets', image: 'https://via.placeholder.com/200', description: 'Планшет Samsung' }
-      ]
-      dispatch(setProducts(mockProducts))
-      dispatch(setLoading(false))
-    }, 1000)
+    dispatch(fetchProducts())
   }, [dispatch])
 
   const filteredProducts = products.filter(product => {
@@ -82,8 +71,12 @@ function ProductList() {
     setSortBy(e.target.value)
   }
 
-  if (loading) {
+  if (status === 'idle' || status === 'loading') {
     return <div className="loading">Загрузка товаров...</div>
+  }
+
+  if (status === 'failed') {
+    return <div className="error">Не удалось загрузить товары: {error}</div>
   }
 
   return (
@@ -143,7 +136,7 @@ function Cart() {
   const totalPrice = useSelector(selectCartTotal)
   
   const [isOpen, setIsOpen] = useState(false)
-  const [showCheckout, setShowCheckout] = useState(false)
+  const isCheckingOut = useSelector(selectIsCheckingOut)
 
   const handleRemoveItem = (id) => {
     dispatch(removeFromCart(id))
@@ -153,14 +146,14 @@ function Cart() {
     dispatch(updateQuantity({ id, quantity }))
   }
 
-  const handleCheckout = () => {
-    setShowCheckout(true)
-    setTimeout(() => {
+  const handleCheckout = async () => {
+    try {
+      await dispatch(checkout()).unwrap()
       alert('Заказ оформлен!')
-      dispatch(clearCart())
-      setShowCheckout(false)
       setIsOpen(false)
-    }, 1000)
+    } catch {
+      alert('Не удалось оформить заказ')
+    }
   }
 
   return (
@@ -215,9 +208,9 @@ function Cart() {
             <button 
               className="checkout-btn"
               onClick={handleCheckout}
-              disabled={cart.length === 0 || showCheckout}
+              disabled={cart.length === 0 || isCheckingOut}
             >
-              {showCheckout ? 'Оформляем...' : 'Оформить заказ'}
+              {isCheckingOut ? 'Оформляем...' : 'Оформить заказ'}
             </button>
           </div>
         </div>
@@ -231,13 +224,7 @@ function Header() {
   const user = useSelector(selectUser)
   
   useEffect(() => {
-    setTimeout(() => {
-      dispatch(setUser({ 
-        id: 1, 
-        name: 'Иван Иванов', 
-        email: 'ivan@example.com' 
-      }))
-    }, 500)
+    dispatch(fetchUser())
   }, [dispatch])
 
   return (

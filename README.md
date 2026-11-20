@@ -54,3 +54,11 @@ npm run dev
 - Разделил один большой слайс `app` на три: `products`, `cart`, `user`. Каждый в своем файле в `src/store/slices/`, store настраивается в `src/store/store.js`, а `src/store/index.js` реэкспортирует store, экшены и селекторы, чтобы все импортировалось из `./store` (мне так нравится).
 - Убрал из store значения `cartCount`, `cartItemsCount`, `totalPrice` и другие. Это одни и те же данные, которые пересчитывались в каждом редьюсере. Теперь количество и сумма считаются селекторами `selectCartCount` и `selectCartTotal` через `createSelector`.
 - В компонентах заменил `dispatch({ type: 'app/...' })` и `state.app` на actions и селекторы.
+
+### Шаг 3. Загрузка данных
+
+- Вынес моковые данные и «запросы» из компонентов в `src/api/` (`getProducts`, `getUser`, `createOrder`).
+- Заменил `setTimeout` внутри `useEffect` на `createAsyncThunk`: `fetchProducts`, `fetchUser`, `checkout`. `condition` я поставил для StrictMode, чтобы загрузки не происходило дважды.
+- Вместо `loading: true/false` у загрузки теперь `status` (`idle` / `loading` / `succeeded` / `failed`) и `error`. Если товары не загрузились, показывается сообщение об ошибке.
+- Оформление заказа тоже сделал через thunk: корзина очищается в `checkout.fulfilled`.
+- Удалил экшены `setProducts`, `setLoading`, `setUser`, `clearCart`: они больше не нужны.

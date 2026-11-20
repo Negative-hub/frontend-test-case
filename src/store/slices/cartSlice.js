@@ -1,9 +1,16 @@
-import { createSlice, createSelector } from '@reduxjs/toolkit'
+import { createSlice, createSelector, createAsyncThunk } from '@reduxjs/toolkit'
+import { createOrder } from '../../api/order'
+
+export const checkout = createAsyncThunk('cart/checkout', (_, { getState }) => {
+  const state = getState()
+  return createOrder(state.cart.items)
+})
 
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
     items: [],
+    checkoutStatus: 'idle', // 'idle' | 'loading' | 'failed'
   },
   reducers: {
     addToCart: (state, action) => {
@@ -30,13 +37,24 @@ const cartSlice = createSlice({
       const item = state.items.find((item) => item.id === id)
       if (item) item.quantity = quantity
     },
-    clearCart: (state) => {
-      state.items = []
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(checkout.pending, (state) => {
+        state.checkoutStatus = 'loading'
+      })
+      .addCase(checkout.fulfilled, (state) => {
+        state.checkoutStatus = 'idle'
+        state.items = []
+      })
+      .addCase(checkout.rejected, (state) => {
+        state.checkoutStatus = 'failed'
+      })
   },
 })
 
 export const selectCartItems = (state) => state.cart.items
+export const selectIsCheckingOut = (state) => state.cart.checkoutStatus === 'loading'
 
 export const selectCartCount = createSelector([selectCartItems], (items) =>
   items.reduce((total, item) => total + item.quantity, 0),
@@ -46,5 +64,5 @@ export const selectCartTotal = createSelector([selectCartItems], (items) =>
   items.reduce((total, item) => total + item.price * item.quantity, 0),
 )
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions
+export const { addToCart, removeFromCart, updateQuantity } = cartSlice.actions
 export default cartSlice.reducer
