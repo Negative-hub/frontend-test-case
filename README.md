@@ -57,8 +57,16 @@ npm run dev
 
 ### Шаг 3. Загрузка данных
 
-- Вынес моковые данные и «запросы» из компонентов в `src/api/` (`getProducts`, `getUser`, `createOrder`).
+- Вынес моковые данные и "запросы" из компонентов в `src/api/` (`getProducts`, `getUser`, `createOrder`).
 - Заменил `setTimeout` внутри `useEffect` на `createAsyncThunk`: `fetchProducts`, `fetchUser`, `checkout`. `condition` я поставил для StrictMode, чтобы загрузки не происходило дважды.
 - Вместо `loading: true/false` у загрузки теперь `status` (`idle` / `loading` / `succeeded` / `failed`) и `error`. Если товары не загрузились, показывается сообщение об ошибке.
-- Оформление заказа тоже сделал через thunk: корзина очищается в `checkout.fulfilled`.
-- Удалил экшены `setProducts`, `setLoading`, `setUser`, `clearCart`: они больше не нужны.
+- Оформление заказа тоже сделал через thunk.
+- Удалил экшены `setProducts`, `setLoading`, `setUser`, `clearCart`.
+
+### Шаг 4. Компоненты
+
+- Разбил `App.jsx`, в котором было все, на компоненты: `Header`, `ProductList`, `ProductFilters`, `ProductGrid`, `ProductCard`, `Cart`, `CartItem`.
+- Перенес `Provider` в `main.jsx`.
+- Починил кнопку "Показать/Скрыть фильтры".
+- Фильтрацию и сортировку товаров обернул в `useMemo`: они пересчитываются только при смене товаров или фильтров.
+- Пока оформляется заказ, кнопки "Добавить в корзину", `+`, `−` и "Удалить" заблокированы. Раньше можно было добавить товар во время оформления.
