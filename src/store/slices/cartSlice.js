@@ -54,7 +54,8 @@ const cartSlice = createSlice({
 })
 
 export const selectCartItems = (state) => state.cart.items
-export const selectIsCheckingOut = (state) => state.cart.checkoutStatus === 'loading'
+export const selectIsCheckingOut = (state) =>
+  state.cart.checkoutStatus === 'loading'
 
 export const selectCartCount = createSelector([selectCartItems], (items) =>
   items.reduce((total, item) => total + item.quantity, 0),

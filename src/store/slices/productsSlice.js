@@ -1,12 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getProducts } from '../../api/products'
 
-export const fetchProducts = createAsyncThunk('products/fetchProducts', getProducts, {
-  condition: (_, { getState }) => {
-    const state = getState()
-    return state.products.status === 'idle'
+export const fetchProducts = createAsyncThunk(
+  'products/fetchProducts',
+  getProducts,
+  {
+    condition: (_, { getState }) => {
+      const state = getState()
+      return state.products.status === 'idle'
+    },
   },
-})
+)
 
 const productsSlice = createSlice({
   name: 'products',
@@ -28,7 +32,8 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = 'failed'
-        state.error = action.error.message || 'Неизвестная ошибка. Попробуйте позже'
+        state.error =
+          action.error.message || 'Неизвестная ошибка. Попробуйте позже'
       })
   },
 })
