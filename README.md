@@ -48,3 +48,9 @@ npm run dev
 
 - Добавил ESLint с несколькими правилами: неиспользуемые переменные и правила хуков React.
 - Добавил Prettier, чтобы код был отформатирован одинаково.
+
+### Шаг 2. Store
+
+- Разделил один большой слайс `app` на три: `products`, `cart`, `user`. Каждый в своем файле в `src/store/slices/`, store настраивается в `src/store/store.js`, а `src/store/index.js` реэкспортирует store, экшены и селекторы, чтобы все импортировалось из `./store` (мне так нравится).
+- Убрал из store значения `cartCount`, `cartItemsCount`, `totalPrice` и другие. Это одни и те же данные, которые пересчитывались в каждом редьюсере. Теперь количество и сумма считаются селекторами `selectCartCount` и `selectCartTotal` через `createSelector`.
+- В компонентах заменил `dispatch({ type: 'app/...' })` и `state.app` на actions и селекторы.

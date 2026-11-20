@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import { Provider, useSelector, useDispatch } from 'react-redux'
-import { store, setProducts, setUser, setLoading } from './store/store'
+import {
+  store,
+  setProducts,
+  setLoading,
+  selectProducts,
+  selectProductsLoading,
+  addToCart,
+  removeFromCart,
+  updateQuantity,
+  clearCart,
+  selectCartItems,
+  selectCartCount,
+  selectCartTotal,
+  setUser,
+  selectUser,
+} from './store'
 
 import './App.css'
 
@@ -20,8 +35,8 @@ function App() {
 
 function ProductList() {
   const dispatch = useDispatch()
-  const products = useSelector((state) => state.app.products)
-  const loading = useSelector((state) => state.app.loading)
+  const products = useSelector(selectProducts)
+  const loading = useSelector(selectProductsLoading)
   
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -110,10 +125,7 @@ function ProductList() {
             <p>{product.description}</p>
             <div className="price">${product.price}</div>
             <button 
-              onClick={() => {
-                const action = { type: 'app/addToCart', payload: product }
-                dispatch(action)
-              }}
+              onClick={() => dispatch(addToCart(product))}
             >
               Добавить в корзину
             </button>
@@ -126,30 +138,26 @@ function ProductList() {
 
 function Cart() {
   const dispatch = useDispatch()
-  const cart = useSelector((state) => state.app.cart)
-  const cartCount = useSelector((state) => state.app.cartCount)
-  const totalPrice = useSelector((state) => state.app.totalPrice)
+  const cart = useSelector(selectCartItems)
+  const cartCount = useSelector(selectCartCount)
+  const totalPrice = useSelector(selectCartTotal)
   
   const [isOpen, setIsOpen] = useState(false)
   const [showCheckout, setShowCheckout] = useState(false)
 
   const handleRemoveItem = (id) => {
-    dispatch({ type: 'app/removeFromCart', payload: id })
+    dispatch(removeFromCart(id))
   }
 
   const handleUpdateQuantity = (id, quantity) => {
-    if (quantity <= 0) {
-      handleRemoveItem(id)
-      return
-    }
-    dispatch({ type: 'app/updateQuantity', payload: { id, quantity } })
+    dispatch(updateQuantity({ id, quantity }))
   }
 
   const handleCheckout = () => {
     setShowCheckout(true)
     setTimeout(() => {
       alert('Заказ оформлен!')
-      dispatch({ type: 'app/clearCart' })
+      dispatch(clearCart())
       setShowCheckout(false)
       setIsOpen(false)
     }, 1000)
@@ -220,7 +228,7 @@ function Cart() {
 
 function Header() {
   const dispatch = useDispatch()
-  const user = useSelector((state) => state.app.user)
+  const user = useSelector(selectUser)
   
   useEffect(() => {
     setTimeout(() => {
